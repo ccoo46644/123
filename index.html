@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>晴天P莉 Part 13 (滿滿的祝福)</title>
+    <title>全螢幕貼圖！Honobono × Snoopy（冬） Sticker Shop</title>
     
     <!-- Scripts for standalone React -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -173,6 +173,16 @@
             text-indent: 0.15em !important; /* 修正因字距產生的視覺偏移 */
             text-align: center !important;
         }
+
+        /* 全螢幕貼圖專屬動畫 */
+        @keyframes popupOpen {
+            0% { opacity: 0; transform: scale(0.5) rotate(-5deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .animate-popup-open {
+            animation: popupOpen 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
     </style>
 </head>
 <body>
@@ -196,7 +206,7 @@
             <section className="w-full">
                 {/* 頂部標題列 */}
                 <div className="bg-[#333333] py-4 mb-6">
-                    <h1 className="top-bar-title text-lg font-bold">個人原創貼圖</h1>
+                    <h1 className="top-bar-title text-lg font-bold">官方貼圖</h1>
                 </div>
 
                 <div className="px-5">
@@ -205,31 +215,28 @@
                         <div className="w-[120px] flex-shrink-0">
                             <div className="relative">
                                 <img 
-                                    src="https://stickershop.line-scdn.net/stickershop/v1/product/18026057/iPhone/main@2x.png?v=1" 
+                                    src="https://stickershop.line-scdn.net/stickershop/v1/product/29826/LINEStorePC/main.png?v=2" 
                                     className="w-full h-auto"
                                     referrerPolicy="no-referrer"
                                 />
-                                <div className="absolute bottom-1 right-1 bg-white/90 border border-gray-100 p-1 rounded-full">
-                                    <PlayIcon />
-                                </div>
                             </div>
                         </div>
 
                         {/* 右側資訊 */}
                         <div className="flex-1 min-w-0">
-                            <h2 className="sticker-title">晴天P莉 Part 13 (滿滿的祝福)</h2>
+                            <h2 className="sticker-title">全螢幕貼圖！Honobono × Snoopy（冬）</h2>
                             <div className="author-box">
                                 <a 
-                                    href="https://store.line.me/stickershop/author/93635/zh-Hant" 
+                                    href="https://store.line.me/stickershop/author/254193/zh-Hant" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="text-[14px] underline underline-offset-4"
                                 >
-                                    C平方
+                                    TV TOKYO Communications Corporation/SNOOPY
                                 </a>
                             </div>
                             <p className="text-[13px] text-black leading-snug mb-2" style={{textAlign: 'left !important'}}>
-                                清新可愛又溫馨的P莉貼心祝福~ 給您滿滿的愛 祝福您 天天快樂 心想事成!!
+                                超人氣插畫家Honobono與Snoopy的聯名貼圖化身為全螢幕貼圖登場！用溫馨可愛的Snoopy佔滿整個大螢幕來表達心情吧！是各種冬季活動的最佳良伴♪
                             </p>
                             <span className="price-text">NT$0</span>
                         </div>
@@ -257,11 +264,11 @@
         );
 
         const StickerGrid = ({ onStickerClick, activeId }) => {
-            const stickers = Array.from({ length: 40 }, (_, i) => ({
-                id: 465874638 + i,
-                // 此系列為靜態貼圖
-                url: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${465874638 + i}/iPhone/sticker@2x.png?v=1`,
-                animUrl: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${465874638 + i}/iPhone/sticker@2x.png?v=1`
+            const stickers = Array.from({ length: 24 }, (_, i) => ({
+                id: 633047198 + i,
+                // 此系列為全螢幕/動態貼圖
+                url: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${633047198 + i}/iPhone/sticker@2x.png?v=2`,
+                animUrl: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${633047198 + i}/android/sticker_popup.png?v=2`
             }));
 
             return (
@@ -281,11 +288,6 @@
                                         className="w-full h-auto object-contain"
                                         referrerPolicy="no-referrer"
                                     />
-                                    {!isActive && (
-                                        <div className="play-badge">
-                                            <PlayIcon />
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })}
@@ -299,13 +301,13 @@
 
             useEffect(() => {
                 if (selectedSticker) {
-                    const timer = setTimeout(() => { setSelectedSticker(null); }, 2000);
+                    const timer = setTimeout(() => { setSelectedSticker(null); }, 2000); // 2秒後自動關閉
                     return () => clearTimeout(timer);
                 }
             }, [selectedSticker]);
 
             return (
-                <div className="min-h-screen bg-white">
+                <div className="min-h-screen bg-white relative">
                     <main className="w-full py-4">
                         <StickerDetail />
                         <StickerGrid 
@@ -313,6 +315,25 @@
                             activeId={selectedSticker?.id}
                         />
                     </main>
+
+                    {/* 全螢幕貼圖／全屏彈出效果 */}
+                    {selectedSticker && (
+                        <div 
+                            className="fixed inset-0 bg-black/70 z-[9999] flex flex-col items-center justify-center p-4 cursor-pointer select-none animate-fade-in"
+                            onClick={() => setSelectedSticker(null)}
+                        >
+                            {/* 白光亮起的光暈燈效 */}
+                            <div className="absolute w-[320px] h-[320px] bg-white/15 rounded-full blur-[90px] pointer-events-none"></div>
+                            
+                            <div className="relative flex flex-col items-center justify-center w-full max-w-[85%] md:max-w-[420px]">
+                                <img 
+                                    src={`https://stickershop.line-scdn.net/stickershop/v1/sticker/${selectedSticker.id}/android/sticker_popup.png?v=2`}
+                                    className="w-full h-auto object-contain max-h-[62vh] animate-popup-open drop-shadow-[0_20px_50px_rgba(255,255,255,0.2)]"
+                                    referrerPolicy="no-referrer"
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
