@@ -3,437 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>全螢幕貼圖！Honobono × Snoopy（冬） Sticker Shop</title>
+    <title>神明有話說-土地公篇 1 Sticker Shop</title>
     
+    <!-- Weebly 崁入所需之 React 與外部庫 CDN（免編譯、單一檔案直接執行） -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* 強力隱藏 Weebly 預設多餘的頁首頁尾、導覽列，確保貼圖商店極致滿版乾淨 */
+        #header-wrap, #nav-wrap, .weebly-header, header.weebly-header, .header-wrap, 
+        .mobile-nav-trigger, .hamburger, .w-nav, #mobile-nav, .footer-wrap, #footer,
+        .weebly-footer, .weebly-page-footer {
+            display: none !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
         }
 
         html, body {
-            height: 100%;
-            width: 100%;
-            background-color: #f0f2f5;
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            height: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f0f2f5 !important;
         }
 
         body {
-            overflow-x: hidden;
+            font-family: 'Noto Sans TC', sans-serif !important;
+            -webkit-tap-highlight-color: transparent;
+            text-align: left !important; /* 強制左對齊，防止 Weebly 樣式置中 */
+        }
+        
+        #root { 
+            width: 100% !important;
+            max-width: 600px !important; /* 手機版與桌面版最適寬度 */
+            margin: 0 auto !important; 
+            background: white !important; 
+            min-height: 100vh !important;
+            position: relative !important;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05) !important;
+            display: block !important;
         }
 
-        #root {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.05);
-        }
-
+        /* 手機板強制 100% 滿版 */
         @media (max-width: 600px) {
             #root {
-                max-width: 100%;
-                box-shadow: none;
+                max-width: 100% !important;
+                box-shadow: none !important;
             }
         }
 
-        /* 隱藏捲軸 */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-        
-        * {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* 頂部標題列 */
-        .top-bar {
-            background-color: #333333;
-            color: white;
-            padding: 16px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 0.2em;
-            margin-bottom: 24px;
+        /* 強制覆蓋 Weebly 對標題與段落的預設侵入式樣式 */
+        #root h1, #root h2, #root p, #root span, #root a {
+            margin: 0 !important;
+            padding: 0 !important;
+            text-transform: none !important;
+            letter-spacing: normal !important;
+            text-align: left !important;
         }
 
-        .content {
-            padding: 0 20px;
+        /* 最上方導覽條標題置中樣式 */
+        #root .top-bar-title {
+            text-align: center !important;
+            width: 100% !important;
+            display: block !important;
+            letter-spacing: 0.2em !important;
+            color: white !important;
         }
 
-        /* 貼圖詳情區 */
-        .sticker-detail {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            margin-bottom: 24px;
+        #root .sticker-title {
+            font-size: 20px !important;
+            line-height: 1.3 !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+            display: block !important;
+            margin-bottom: 4px !important;
         }
 
-        .sticker-cover {
-            width: 120px;
-            flex-shrink: 0;
+        #root .price-text {
+            font-size: 24px !important;
+            color: #5cba3d !important;
+            font-weight: 700 !important;
+            display: block !important;
         }
 
-        .sticker-cover img {
-            width: 100%;
-            height: auto;
-            display: block;
+        /* 作者資訊樣式 */
+        #root .author-box {
+            text-align: left !important;
+            display: block !important;
+            width: 100% !important;
+            margin-bottom: 8px !important;
         }
 
-        .sticker-info {
-            flex: 1;
-            min-width: 0;
+        #root .author-box a {
+            text-align: left !important;
+            display: inline-block !important;
+            color: #6b7280 !important;
         }
 
-        .sticker-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
+        /* 隱藏預設捲軸，讓介面像 App 一樣簡潔 */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .author-box {
-            margin-bottom: 8px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-
-        .author-box a {
-            font-size: 14px;
-            color: #6b7280;
-            text-decoration: underline;
-            text-decoration-offset: 4px;
-        }
-
-        .sticker-description {
-            font-size: 13px;
-            color: #000;
-            line-height: 1.5;
-            margin-bottom: 12px;
-            text-align: left;
-        }
-
-        .price-text {
-            font-size: 24px;
-            color: #5cba3d;
-            font-weight: 700;
-            display: block;
-        }
-
-        /* 按鈕區 */
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        button {
-            padding: 12px 16px;
-            font-size: 17px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            letter-spacing: 0.15em;
-            text-indent: 0.15em;
-            transition: all 0.2s ease;
-            font-family: 'Noto Sans TC', sans-serif;
-            text-align: center;
-        }
-
-        .btn-gift {
-            background-color: #464646;
-            color: white;
-        }
-
-        .btn-gift:active {
-            transform: scale(0.95);
-        }
-
-        .btn-download {
-            background-color: #5cba3d;
-            color: white;
-        }
-
-        .btn-download:active {
-            transform: scale(0.95);
-        }
-
-        /* 貼圖網格分隔線 */
-        .grid-divider {
-            border-top: 1px solid #f3f4f6;
-            padding-top: 24px;
-            margin-top: 0;
-        }
-
-        .grid-hint {
-            text-align: center;
-            color: #000;
-            font-size: 13px;
-            margin-bottom: 24px;
-        }
-
-        /* 貼圖網格 */
-        .sticker-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            padding-bottom: 24px;
-        }
-
-        .sticker-item {
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1;
-        }
-
-        .sticker-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: contain;
-        }
-
-        .sticker-item.active {
-            transform: scale(1.35);
-            z-index: 50;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
-        }
-
-        /* 彈出視窗 */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
+        .animate-fade-in {
             animation: fadeIn 0.2s ease-out forwards;
         }
 
-        .modal-content {
+        /* 貼圖列表動態特效 */
+        .sticker-item {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            touch-action: manipulation;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-width: 85%;
+            z-index: 1;
+        }
+        
+        .sticker-item.active {
+            transform: scale(1.35) !important;
+            z-index: 50 !important;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
         }
 
-        @media (min-width: 768px) {
-            .modal-content {
-                max-width: 420px;
-            }
+        /* 仿 LINE 按鈕字距優化 */
+        #root .btn-text {
+            letter-spacing: 0.15em !important;
+            text-indent: 0.15em !important;
+            text-align: center !important;
         }
 
-        .modal-image {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-            max-height: 62vh;
-            filter: drop-shadow(0 20px 50px rgba(255, 255, 255, 0.2));
-            animation: popupOpen 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .modal-glow {
-            position: absolute;
-            width: 320px;
-            height: 320px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            filter: blur(90px);
-            pointer-events: none;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
+        /* LINE 全螢幕貼圖專屬震撼彈出動畫 */
         @keyframes popupOpen {
-            0% {
-                opacity: 0;
-                transform: scale(0.5) rotate(-5deg);
-            }
-            50% {
-                transform: scale(1.1) rotate(2deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
+            0% { opacity: 0; transform: scale(0.5) rotate(-5deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
-
-        @media (max-width: 600px) {
-            .sticker-detail {
-                gap: 12px;
-                margin-bottom: 20px;
-            }
-
-            .sticker-cover {
-                width: 100px;
-            }
-
-            .sticker-title {
-                font-size: 18px;
-            }
-
-            .button-group {
-                gap: 10px;
-                margin-bottom: 24px;
-            }
-
-            button {
-                padding: 10px 12px;
-                font-size: 15px;
-            }
-
-            .sticker-grid {
-                gap: 12px;
-            }
+        .animate-popup-open {
+            animation: popupOpen 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
     </style>
 </head>
 <body>
-    <div id="root">
-        <!-- 頂部標題 -->
-        <div class="top-bar">個人原創貼圖</div>
+    <!-- React 印出掛載點 -->
+    <div id="root"></div>
 
-        <!-- 主要內容 -->
-        <div class="content">
-            <!-- 貼圖詳情 -->
-            <div class="sticker-detail">
-                <div class="sticker-cover">
-                    <img 
-                        src="https://stickershop.line-scdn.net/stickershop/v1/product/29826/LINEStorePC/main.png?v=2" 
-                        alt="全螢幕貼圖！Honobono × Snoopy（冬）"
-                        referrerPolicy="no-referrer"
-                    />
-                </div>
-                <div class="sticker-info">
-                    <div class="sticker-title">全螢幕貼圖！Honobono × Snoopy（冬）</div>
-                    <div class="author-box">
-                        <a 
-                            href="https://store.line.me/stickershop/author/254193/zh-Hant" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                        >
-                            TV TOKYO Communications Corporation/SNOOPY
-                        </a>
+    <!-- React 邏輯，經由 Babel 在瀏覽器端即時解析，完美適應 Weebly 的任意環境 -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ==========================================
+        // 金流/按鈕跳轉連結（可隨時修改）
+        // ==========================================
+        const GIFT_URL = "https://goodgifttosend.tw/hDMlp";     // 贈送禮物連結
+        const DOWNLOAD_URL = "https://goodgifttosend.tw/hDMlp"; // 下載連結
+        // ==========================================
+
+        const NAMES = ["陳冠宇", "林雅婷", "張家豪", "黃怡君", "王俊傑", "劉婷婷", "李怡萱", "蔡志明", "鄭雅琪", "許家瑋"];
+        const TIMES = ["剛剛", "1 分鐘前", "3 分鐘前", "5 分鐘前", "8 分鐘前", "12 分鐘前", "15 分鐘前", "24 分鐘前", "30 分鐘前", "45 分鐘前"];
+
+        const StickerDetail = () => {
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [fade, setFade] = useState(true);
+
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    setFade(false);
+                    setTimeout(() => {
+                        setCurrentIndex((prev) => (prev + 1) % NAMES.length);
+                        setFade(true);
+                    }, 300); // fade out duration
+                }, 4000);
+                return () => clearInterval(interval);
+            }, []);
+
+            return (
+                <section className="w-full">
+                    {/* 頂部標題列 */}
+                    <div className="bg-[#333333] py-4 mb-6">
+                        <h1 className="top-bar-title text-lg font-bold">個人原創貼圖</h1>
                     </div>
-                    <p class="sticker-description">
-                        超人氣插畫家Honobono與Snoopy的聯名貼圖化身為全螢幕貼圖登場！用溫馨可愛的Snoopy佔滿整個大螢幕來表達心情吧！是各種冬季活動的最佳良伴♪
-                    </p>
-                    <span class="price-text">NT$0</span>
+
+                    <div className="px-5">
+                        <div className="flex flex-row gap-4 items-start mb-6">
+                            {/* 左側貼圖封面 */}
+                            <div className="w-[120px] flex-shrink-0">
+                                <div className="relative">
+                                    <img 
+                                        src="https://stickershop.line-scdn.net/stickershop/v1/product/33249399/LINEStorePC/main.png?v=1" 
+                                        className="w-full h-auto"
+                                        alt="神明有話說-土地公篇 1"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 右側貼圖基本資訊 */}
+                            <div className="flex-1 min-w-0">
+                                <h2 className="sticker-title">神明有話說-土地公篇 1</h2>
+                                <div className="author-box">
+                                    <a 
+                                        href="https://store.line.me/stickershop/author/5995809/zh-Hant" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-[14px] underline underline-offset-4"
+                                    >
+                                        Nico
+                                    </a>
+                                </div>
+                                <p className="text-[13px] text-black leading-snug mb-2" style={{textAlign: 'left'}}>
+                                    神明有話說-土地公篇 1
+                                </p>
+                                <span className="price-text font-bold">NT$0</span>
+                            </div>
+                        </div>
+
+                        {/* 贈送與購買下載按鈕 */}
+                        <div className="grid grid-cols-2 gap-3 mb-6">
+                            <button 
+                                onClick={() => window.location.href = GIFT_URL}
+                                className="btn-text py-3 bg-[#464646] text-white font-bold text-[17px] rounded-md active:scale-95 transition-all outline-none"
+                                style={{backgroundColor: '#464646 !important', color: 'white !important'}}
+                            >
+                                贈送禮物
+                            </button>
+                            <button 
+                                onClick={() => window.location.href = DOWNLOAD_URL}
+                                className="btn-text py-3 bg-[#5cba3d] text-white font-bold text-[17px] rounded-md active:scale-95 transition-all outline-none"
+                                style={{backgroundColor: '#5cba3d !important', color: 'white !important'}}
+                            >
+                                下載
+                            </button>
+                        </div>
+
+                        {/* 動態領取通知（仿 LINE 風格） */}
+                        <div className="flex items-center justify-center mb-6">
+                            <div 
+                                className="flex items-center gap-3 bg-[#f8f9fa] border border-[#e5e7eb] px-5 py-3 rounded-full shadow-sm max-w-sm w-full transition-all duration-300"
+                                style={{ 
+                                    opacity: fade ? 1 : 0,
+                                    transform: fade ? 'scale(1)' : 'scale(0.98)'
+                                }}
+                            >
+                                {/* 綠色購物車圓圈 */}
+                                <div className="w-8 h-8 rounded-full bg-[#06C755] flex items-center justify-center flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="8" cy="21" r="1"/>
+                                        <circle cx="19" cy="21" r="1"/>
+                                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+                                    </svg>
+                                </div>
+                                {/* 領取文字 */}
+                                <p className="text-[14px] text-gray-700 font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                                    <span className="text-gray-500">{TIMES[currentIndex]}</span>
+                                    <span className="text-gray-400 mx-1">，</span>
+                                    <span className="text-gray-800 font-bold">{NAMES[currentIndex]}</span>
+                                    <span className="text-gray-600"> 領取了貼圖</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const StickerGrid = ({ onStickerClick, activeId }) => {
+            // 此款 LINE 貼圖序號為 825685369 ~ 825685400（共 32 張貼圖）
+            const stickers = Array.from({ length: 32 }, (_, i) => ({
+                id: 825685369 + i,
+                url: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${825685369 + i}/android/sticker.png?v=1`,
+                animUrl: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${825685369 + i}/android/sticker.png?v=1`
+            }));
+
+            return (
+                <div className="border-t border-gray-100 pt-6 px-4">
+                    <p className="text-center text-black text-[13px] mb-6" style={{textAlign: 'center'}}>點擊貼圖即可預覽。</p>
+                    <div className="grid grid-cols-4 gap-4">
+                        {stickers.map((sticker) => {
+                            const isActive = activeId === sticker.id;
+                            return (
+                                <div
+                                    key={sticker.id}
+                                    className={`sticker-item cursor-pointer ${isActive ? 'active' : ''}`}
+                                    onClick={() => onStickerClick(sticker)}
+                                >
+                                    <img 
+                                        src={isActive ? sticker.animUrl : sticker.url} 
+                                        alt={`貼圖 ${sticker.id}`}
+                                        className="w-full h-auto object-contain"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            );
+        };
 
-            <!-- 按鈕 -->
-            <div class="button-group">
-                <button class="btn-gift" onclick="window.location.href='https://goodgifttosend.tw/hDMlp'">贈送禮物</button>
-                <button class="btn-download" onclick="window.location.href='https://goodgifttosend.tw/hDMlp'">下載</button>
-            </div>
+        const App = () => {
+            const [selectedSticker, setSelectedSticker] = useState(null);
 
-            <!-- 貼圖網格分隔 -->
-            <div class="grid-divider">
-                <div class="grid-hint">點擊貼圖即可預覽。</div>
-                
-                <!-- 貼圖網格 -->
-                <div class="sticker-grid" id="stickerGrid"></div>
-            </div>
-        </div>
-    </div>
+            // 自動計時器：於全螢幕展示剛好 3.0 秒後自動關閉
+            useEffect(() => {
+                if (selectedSticker) {
+                    const timer = setTimeout(() => { 
+                        setSelectedSticker(null); 
+                    }, 3000); // 3000 毫秒 = 3.0 秒
+                    return () => clearTimeout(timer);
+                }
+            }, [selectedSticker]);
 
-    <!-- 彈出視窗 -->
-    <div id="modal" class="modal-overlay" style="display: none;" onclick="closeModal()">
-        <div class="modal-glow"></div>
-        <div class="modal-content">
-            <img id="modalImage" class="modal-image" alt="全螢幕預覽" referrerPolicy="no-referrer" />
-        </div>
-    </div>
-
-    <script>
-        // 貼圖數據（633047198 ~ 633047221，共 24 張全螢幕動態貼圖）
-        const stickers = Array.from({ length: 24 }, (_, i) => ({
-            id: 633047198 + i,
-            url: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${633047198 + i}/iPhone/sticker@2x.png?v=2`,
-            animUrl: `https://stickershop.line-scdn.net/stickershop/v1/sticker/${633047198 + i}/android/sticker_popup.png?v=2`
-        }));
-
-        // 渲染貼圖網格
-        function renderStickers() {
-            const grid = document.getElementById('stickerGrid');
-            grid.innerHTML = stickers.map(sticker => `
-                <div class="sticker-item" onclick="openModal(${sticker.id}, '${sticker.animUrl}')">
-                    <img 
-                        src="${sticker.url}" 
-                        alt="貼圖 ${sticker.id}"
-                        referrerPolicy="no-referrer"
-                    />
+            return (
+                <div className="min-h-screen bg-white relative">
+                    <main className="w-full py-4">
+                        <StickerDetail />
+                        <StickerGrid 
+                            onStickerClick={(sticker) => setSelectedSticker(sticker)} 
+                            activeId={selectedSticker?.id}
+                        />
+                    </main>
                 </div>
-            `).join('');
-        }
+            );
+        };
 
-        // 打開彈出視窗
-        let autoCloseTimer;
-        function openModal(stickerId, animUrl) {
-            const modal = document.getElementById('modal');
-            const modalImage = document.getElementById('modalImage');
-            
-            modalImage.src = animUrl;
-            modal.style.display = 'flex';
-
-            // 清除之前的計時器
-            if (autoCloseTimer) {
-                clearTimeout(autoCloseTimer);
-            }
-
-            // 3 秒後自動關閉
-            autoCloseTimer = setTimeout(() => {
-                closeModal();
-            }, 3000);
-        }
-
-        // 關閉彈出視窗
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.style.display = 'none';
-
-            // 清除計時器
-            if (autoCloseTimer) {
-                clearTimeout(autoCloseTimer);
-            }
-        }
-
-        // 點擊背景關閉
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // 初始化
-        renderStickers();
+        // 渲染至網頁挂載點
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
